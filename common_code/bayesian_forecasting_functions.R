@@ -184,7 +184,7 @@ find_champion_bayesian <- function(data,
         cpt_no[i] = length(knotpoints[[i]])
       }
     } else{
-      knotpoints = which(train[,cp_timescale] %in% changepoint_dates)
+      knotpoints = which(unlist(train[,cp_timescale]) %in% changepoint_dates)
       cpt_no = length(knotpoints)
     }
     train_cpt = as.list(rep(NA,max_changepoints))
