@@ -1,9 +1,10 @@
 #  #######################################################################
-#       File-Name:      bayesian_forecasting_functions.R
+#       File-Name:      bayesian_forecasting_functions_v2.R
 #       Version:        R 3.5.2
 #       Date:           Jul 17, 2019
 #       Author:         Jiacheng Wang <Jiacheng.Wang@nbcuni.com>
 #       Purpose:        contains all functions related to bayesian model fitting
+#                       This version choose the optimal model based on total mape/smape.
 #       Input Files:    NONE
 #       Output Files:   NONE
 #       Data Output:    NONE
@@ -500,8 +501,10 @@ find_champion_bayesian <- function(data,
       }
     }
   }
-  cpt_optimal_mape = ifelse(which.min(MAPE_test)%%cpt_add2>0,(which.min(MAPE_test)%%cpt_add2)*cpt_add,max_changepoints)
-  cpt_optimal_smape = ifelse(which.min(SMAPE_test)%%cpt_add2>0,(which.min(SMAPE_test)%%cpt_add2)*cpt_add,max_changepoints)
+  MAPE_total =  MAPE_train + MAPE_test
+  SMAPE_total =  SMAPE_train + SMAPE_test
+  cpt_optimal_mape = ifelse(which.min(MAPE_total)%%cpt_add2>0,(which.min(MAPE_total)%%cpt_add2)*cpt_add,max_changepoints)
+  cpt_optimal_smape = ifelse(which.min(SMAPE_total)%%cpt_add2>0,(which.min(SMAPE_total)%%cpt_add2)*cpt_add,max_changepoints)
   if (max_changepoints > 0){
     beta_cv_tmp_mape = beta_total[which(unlist(lapply(beta_total,length)) == cpt_optimal_mape+1)]
     beta_sd_mape = apply(matrix(unlist(beta_cv_tmp_mape),nrow = ncol(reg_train)*(cpt_optimal_mape+1)),1,sd) %>% round(6)
@@ -524,14 +527,12 @@ find_champion_bayesian <- function(data,
   model_upper_smape = c(rep("-",ncol(all_model)),beta_bound_smape[2,],quantile(sigma_total,0.975)%>%round(6))
   
   
-  MAPE_total =  MAPE_train + MAPE_test
-  SMAPE_total =  SMAPE_train + SMAPE_test
-  model_optimal_mape = all_model[which.min(MAPE_test)*(1-cpt_add)+cpt_add*(ceiling(which.min(MAPE_test)/cpt_add2)),]
-  model_optimal_smape = all_model[which.min(SMAPE_test)*(1-cpt_add)+cpt_add*(ceiling(which.min(MAPE_test)/cpt_add2)),]
-  beta_optimal_mape = beta_total[[which.min(MAPE_test)]]
-  beta_optimal_smape = beta_total[[which.min(SMAPE_test)]]
-  sigma_optimal_mape = sigma_total[which.min(MAPE_test)]
-  sigma_optimal_smape = sigma_total[which.min(SMAPE_test)]
+  model_optimal_mape = all_model[which.min(MAPE_total)*(1-cpt_add)+cpt_add*(ceiling(which.min(MAPE_total)/cpt_add2)),]
+  model_optimal_smape = all_model[which.min(SMAPE_total)*(1-cpt_add)+cpt_add*(ceiling(which.min(MAPE_total)/cpt_add2)),]
+  beta_optimal_mape = beta_total[[which.min(MAPE_total)]]
+  beta_optimal_smape = beta_total[[which.min(SMAPE_total)]]
+  sigma_optimal_mape = sigma_total[which.min(MAPE_total)]
+  sigma_optimal_smape = sigma_total[which.min(SMAPE_total)]
   if (sum(model_optimal_mape!=model_optimal_smape)!= 0) warning("optimal model for mape and smape is different! Prediction is based on optimal mape!")
   if (sum(apply(matrix(unlist(all_model_margin),ncol = ncol(all_model)),1,function(x) all(x == model_optimal_mape)))==1) warning("Optimal model (mape) uses marginal cv candidate value!")
   if (sum(apply(matrix(unlist(all_model_margin),ncol = ncol(all_model)),1,function(x) all(x == model_optimal_smape)))==1) warning("Optimal model (smape) uses marginal cv candidate value!")
@@ -708,8 +709,8 @@ find_champion_bayesian <- function(data,
                           "regressors","parameters","estimates","changepoints")
   # forecast champion model - test set
   detail_entry$champion = 0
-  minidx_mape = which.min(detail_entry$test_MAPE)
-  minidx_smape = which.min(detail_entry$test_SMAPE)
+  minidx_mape = which.min(detail_entry$total_MAPE)
+  minidx_smape = which.min(detail_entry$total_SMAPE)
   if (minidx_mape != minidx_smape){
     detail_entry$champion[minidx_mape] = "MAPE_CHAMPION"
     detail_entry$champion[minidx_smape] = "SMAPE_CHAMPION"

@@ -24,7 +24,7 @@ source(here::here("common_code","parameters_CENT.R"))
 # Use data_prep_functions_v2.R instead of data_prep_functions.R!
 source(here::here("common_code","data_prep_functions_v2.R"))
 source(here::here("common_code","forecasting_functions.R"))
-source(here::here("common_code","bayesian_forecasting_functions.R"))
+source(here::here("common_code","bayesian_forecasting_functions_v2.R"))
 source(here::here("common_code","model_evaluation.R"))
 source(here::here("common_code","plotting_functions.R"))
 
@@ -110,7 +110,7 @@ champion_bayesian = find_champion_bayesian(data = case_data,
                                            log_transformation = 1,
                                            OOS_start = OOS_start,
                                            regressors = wkly_regressors,
-                                           max_changepoints = 2)
+                                           max_changepoints = 1)
 
 
 # ::::::::::::::: PART3 - CHECK ASSUMPTIONS FOR SELECTED CHAMPION ARIMA MODEL
