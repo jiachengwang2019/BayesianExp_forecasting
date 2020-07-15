@@ -75,7 +75,7 @@ st_check
 # Set up possible sarima model parameters candidates 
 # Notice: 
 # The parameter d in the argument max_arima_order(p,d,q) should take the advice from 'differencing_order' results of `check_stationary()`` function
-weeklylookup <- create_arima_lookuptable(max_arima_order = c(3,1,3),
+weeklylookup <- create_arima_lookuptable(max_arima_order = c(1,1,1),
                                          max_seasonal_order = c(1,0,1),
                                          periods = c(52))
 
@@ -110,6 +110,7 @@ champion_bayesian = find_champion_bayesian(data = case_data,
                                            log_transformation = 1,
                                            OOS_start = OOS_start,
                                            regressors = wkly_regressors,
+                                           variance_change = TRUE,
                                            max_changepoints = 1)
 
 

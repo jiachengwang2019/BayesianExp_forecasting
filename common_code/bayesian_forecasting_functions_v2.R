@@ -720,6 +720,7 @@ find_champion_bayesian <- function(data,
   detail_entry$ranking = 'Average'
   detail_entry$ranking[detail_entry$test_MAPE < acceptable_MAPE] = 'Good'
   detail_entry$ranking[detail_entry$test_MAPE > 2*acceptable_MAPE] = 'Bad'
+  detail_entry = detail_entry[order(detail_entry$total_MAPE,decreasing = F),]
   
   return(list(champion_model = optimal_model,
               champion_result = full_data_champion,
